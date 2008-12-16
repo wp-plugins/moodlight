@@ -1,0 +1,91 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: moodlight 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-11-29 15:25+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team:  <f.gasquez@weelya.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Français\n"
+"X-Poedit-Country: France\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: _e;__\n"
+
+msgid "Négatif"
+msgstr "Négatif"
+
+msgid "Neutre"
+msgstr "Neutre"
+
+msgid "Positif"
+msgstr "Positif"
+
+msgid "couleurs"
+msgstr "couleurs"
+
+msgid "Go !"
+msgstr "Go !"
+
+msgid "Vos articles auront une notre sur"
+msgstr "Vos articles auront une notre sur"
+
+msgid "Voici votre échelle de couleur pour les commentaires"
+msgstr "Voici votre échelle de couleur pour les commentaires"
+
+msgid "Nombre de couleurs"
+msgstr "Nombre de couleurs"
+
+msgid "Texte évaluation positive"
+msgstr "Texte évaluation positive"
+
+msgid "Texte évaluation neutre"
+msgstr "Texte évaluation neutre"
+
+msgid "Texte évaluation négative"
+msgstr "Texte évaluation négative"
+
+msgid "Texte d'évaluation d'un article"
+msgstr "Texte d'évaluation d'un article"
+
+msgid "Enregister"
+msgstr "Enregistrer"
+
+msgid "Fonctionnalités de template"
+msgstr "Fonctionnalités de template"
+
+msgid "Affiche du code HTML contenant le formulaire d'ajout. A utiliser <u>dans</u> le formulaires des commentaires"
+msgstr "Affiche du code HTML contenant le formulaire d'ajout. A utiliser <u>dans</u> le formulaires des commentaires"
+
+msgid "Affiche une div contenant l'humeur générale des commentaires d'un post. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Affiche une div contenant l'humeur générale des commentaires d'un post. A utiliser dans la boucles des articles ou dans un article seul"
+
+msgid "Affiche une div contenant l'humeur générale d'un commentaire d'un post. A utiliser dans la boucles des commentaires"
+msgstr "Affiche une div contenant l'humeur générale d'un commentaire d'un post. A utiliser dans la boucles des commentaires"
+
+msgid "Affiche une chaine de caractère contenant la couleur de l'humeur de l'article. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Affiche une chaine de caractère contenant la couleur de l'humeur de l'article. A utiliser dans la boucles des articles ou dans un article seul"
+
+msgid "Affiche la notation de l'article sous forme purement textuelle. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Affiche la notation de l'article sous forme purement textuelle. A utiliser dans la boucles des articles ou dans un article seul"
+
+msgid "Affiche une chaine de caractère contenant la couleur de l'humeur du commentaire. A utiliser dans la boucles des commentaires"
+msgstr "Affiche une chaine de caractère contenant la couleur de l'humeur du commentaire. A utiliser dans la boucles des commentaires"
+
+msgid "Support Moodlight"
+msgstr "Support Moodlight"
+
+msgid "Configuration de Moodlight"
+msgstr "Configuration de Moodlight"
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Statistiques"
+msgstr "Statistiques"
+
+msgid "Documentation"
+msgstr "Documentation"
+

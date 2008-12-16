@@ -1,0 +1,94 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: moodlight 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-11-29 15:25+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team:  <f.gasquez@weelya.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Français\n"
+"X-Poedit-Country: France\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: _e;__\n"
+
+msgid "Avis sur le sujet"
+msgstr "Your mood on the subjet"
+
+msgid "Négatif"
+msgstr "Negative"
+
+msgid "Neutre"
+msgstr "Neutral"
+
+msgid "Positif"
+msgstr "Positive"
+
+msgid "couleurs"
+msgstr "colors"
+
+msgid "Go !"
+msgstr "Go !"
+
+msgid "Vos articles auront une notre sur"
+msgstr "Your posts will have a mark on"
+
+msgid "Voici votre échelle de couleur pour les commentaires"
+msgstr "Here is your color rate on comments"
+
+msgid "Nombre de couleurs"
+msgstr "Numbers of colors"
+
+msgid "Texte évaluation positive"
+msgstr "Potisitive evaluation text"
+
+msgid "Texte évaluation neutre"
+msgstr "Neutral evaluation text"
+
+msgid "Texte évaluation négative"
+msgstr "Negative evaluation text"
+
+msgid "Texte d'évaluation d'un article"
+msgstr "Post evaluation text"
+
+msgid "Enregister"
+msgstr "Save"
+
+msgid "Fonctionnalités de template"
+msgstr "Template functions"
+
+msgid "Affiche du code HTML contenant le formulaire d'ajout. A utiliser <u>dans</u> le formulaires des commentaires"
+msgstr "Displays HTML code containing the add form. Use <u>in</u> the comment form"
+
+msgid "Affiche une div contenant l'humeur générale des commentaires d'un post. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Displays a div containing the general mood of a post comments. Use in posts loop or in a single post."
+
+msgid "Affiche une div contenant l'humeur générale d'un commentaire d'un post. A utiliser dans la boucles des commentaires"
+msgstr "Displays a div containing general mood of a post. Use in the comments loop"
+
+msgid "Affiche une chaine de caractère contenant la couleur de l'humeur de l'article. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Displays a string containing the mood color of the post. Use in the posts loop or in a single post"
+
+msgid "Affiche la notation de l'article sous forme purement textuelle. A utiliser dans la boucles des articles ou dans un article seul"
+msgstr "Displays the post mark in a textual form. Use in the post loop or in a single post"
+
+msgid "Affiche une chaine de caractère contenant la couleur de l'humeur du commentaire. A utiliser dans la boucles des commentaires"
+msgstr "Displays a string containing the mood color of a comment. Use in the comments loop"
+
+msgid "Support Moodlight"
+msgstr "Moodlight support"
+
+msgid "Configuration de Moodlight"
+msgstr "Moodlight configuration"
+
+msgid "Configuration"
+msgstr "Configure"
+
+msgid "Statistiques"
+msgstr "Stats"
+
+msgid "Documentation"
+msgstr "Documentation"
+
