@@ -1,5 +1,5 @@
 === Moodlight ===
-Contributors: Chavarria John, Gasquez Florian
+Contributors: Gasquez Florian
 Tags: moodlight, comments, posts, mood, thread, debate, tags, vote, rank, stats
 Requires at least: 2.6.0
 Tested up to: 2.7
@@ -13,7 +13,7 @@ Moodlight allows your visitors to add their mood on posts via comments.
 You can customize your posts and comments depending on visitors moods.
 The visitors moods are translated by colors, so it is easy to know if peoples are agree or against the post subject.
 
-----
+--
 
 Moodlight Permet à vos visiteurs de laisser une appréciation sur un article via les commentaires.
 Vous pouvez personnaliser vos articles et vos commentaires en fonction de l'humeur des visiteurs.
@@ -34,3 +34,14 @@ Les appréciations des visiteurs sont traduites par des couleurs, il devient alo
 1. Moodlight options
 2. Moodlight stats
 3. Moodlight front
+
+== Frequently Asked Questions ==
+= 1. How to add templates functions to your current template ? =
+You can see the Moodlight page on Boolean.me : http://www.boolean.me/moodlight 
+
+== Notes ==
+- Thanks to John Chavarria for en_EN.
+- Thanks to Anthony Catel for colors functions
+- Thanks to http://www.cafe-froid.net for percent function.
+- A backlink for boolean.me on line 323 [moodlight.php], you can remove it.
+- A blank img on line 323 [moodlight.php] for stats, please don't remove.
