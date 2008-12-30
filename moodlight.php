@@ -186,9 +186,9 @@
 		global $wpdb;
 	
 		$query = '
-			SELECT '.$wpdb->prefix.'posts.ID, post_title FROM '.$wpdb->prefix.'posts, '.$wpdb->prefix.'moodlight WHERE '.$wpdb->prefix.'moodlight.id_post='.$wpdb->prefix.'posts.ID GROUP BY '.$wpdb->prefix.'posts.ID
+			SELECT '.$wpdb->prefix.'posts.ID, post_title FROM '.$wpdb->prefix.'posts, '.$wpdb->prefix.'moodlight, '.$wpdb->prefix.'moodlight_post WHERE '.$wpdb->prefix.'moodlight.id_post='.$wpdb->prefix.'posts.ID AND '.$wpdb->prefix.'moodlight_post.id_post='.$wpdb->prefix.'posts.ID GROUP BY '.$wpdb->prefix.'posts.ID ORDER BY '.$wpdb->prefix.'posts.ID DESC
 		';
-	
+
 		$posts = $wpdb->get_results($query, OBJECT);
 		
 		return $posts;
@@ -197,9 +197,9 @@
 	function moodlight_all_posts()
 	{
 		global $wpdb;
-		
+
 		$query = '
-			SELECT '.$wpdb->prefix.'posts.ID, post_title FROM '.$wpdb->prefix.'posts WHERE post_type="post"
+			SELECT '.$wpdb->prefix.'posts.ID, post_title FROM '.$wpdb->prefix.'posts WHERE post_type="post" ORDER BY '.$wpdb->prefix.'posts.ID DESC
 		';
 		
 		return $wpdb->get_results($query, OBJECT);
@@ -584,6 +584,21 @@
 	{
 		global $wpdb;
 		
+		// Ugly updates
+		$table_name = $wpdb->prefix . 'moodlight_post';
+		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
+			$sql_query = '
+				CREATE TABLE '.$table_name.' (
+					`id_post` INT NOT NULL ,
+					PRIMARY KEY ( `id_post` )
+				);
+			';
+			
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			
+			dbDelta($sql_query);
+		}
+		
 		if (!$type) {
 			$query = '
 				DELETE FROM '.$wpdb->prefix.'moodlight_post WHERE id_post = '.intval($id_post).'
@@ -666,32 +681,7 @@
 				unset($selected);
 		}
 		
-		// backend active
-		$all_posts  = moodlight_all_posts();
-		$actives    = moodlight_all_active();
-		$posts_list = '';
-		
-		$actives_id = array();
-		foreach ($actives as $v) {
-			$actives_id[] = $v->ID;
-		}
-		
-		foreach ($all_posts as $v) {
-			if ($v->ID == $_POST['id_post']) 
-				$selected = 'selected="selected"';
-				
-			if (!@in_array($v->ID, $actives_id))
-				$more = '[Désactivé]';
-			else
-				$more = '[Activé]';
-				
-			$posts_list .= '<option '.$selected.' value="'.$v->ID.'">'.$more.' '.$v->post_title.'</option>';
-			
-			if ($selected)
-				unset($selected);
-		}
-		
-		$page_active = '
+		$page_stats = '
 			<form method="post" action="">
 				<table class="form-table">
 					<tr>
@@ -709,7 +699,32 @@
 			</form>
 		';
 		
-		$page_stats = '
+		// backend active
+		$all_posts  = moodlight_all_posts();
+		$actives    = moodlight_all_active();
+		$posts_list = '';
+		
+		$actives_id = array();
+		foreach ($actives as $v) {
+			$actives_id[] = $v->id_post;
+		}
+		
+		foreach ($all_posts as $v) {
+			if ($v->ID == $_REQUEST['id_post']) 
+				$selected = 'selected="selected"';
+				
+			if (!@in_array($v->ID, $actives_id))
+				$more = '[Désactivé]';
+			else
+				$more = '[Activé]';
+				
+			$posts_list .= '<option '.$selected.' value="'.$v->ID.'">'.$more.' '.$v->post_title.'</option>';
+			
+			if ($selected)
+				unset($selected);
+		}
+		
+		$page_active = '
 			<form method="post" action="">
 				<table class="form-table">
 					<tr>
