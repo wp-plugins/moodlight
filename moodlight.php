@@ -387,8 +387,10 @@
 		if ($coms > 1) {
 			$s = 's';
 		}
-
-		echo '<img src="http://chart.apis.google.com/chart?chtt='.__('Ambiance des', 'moodlight').' '.$coms.' '.__('commentaire', 'moodlight').$s.' : '.moodtpl_post_note(true).'&amp;chts='.rgb2hex(moodtpl_post_color(true)).',12&amp;chs=300x150&amp;chf=bg,s,ffffff&amp;cht=p3&amp;chd=t:'.$pos.','.$neu.','.$neg.'&amp;chl='.__('Positif', 'moodlight').'|'.__('Neutre', 'moodlight').'|'.__('Négatif', 'moodlight').'&amp;chco=1E7B0F,7B7B0F,7B1E0F" alt="Moodlight"/>';
+		
+		if ($pos || $neu || $neg) {
+			echo '<img src="http://chart.apis.google.com/chart?chtt='.__('Ambiance des', 'moodlight').' '.$coms.' '.__('commentaire', 'moodlight').$s.' : '.moodtpl_post_note(true).'&amp;chts='.rgb2hex(moodtpl_post_color(true)).',12&amp;chs=300x150&amp;chf=bg,s,ffffff&amp;cht=p3&amp;chd=t:'.$pos.','.$neu.','.$neg.'&amp;chl='.__('Positif', 'moodlight').'|'.__('Neutre', 'moodlight').'|'.__('Négatif', 'moodlight').'&amp;chco=1E7B0F,7B7B0F,7B1E0F" alt="Moodlight"/>';
+		}
 	}
 	
 	/* tpl for post color */
