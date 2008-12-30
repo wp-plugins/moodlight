@@ -18,19 +18,22 @@
 	/**
 	 * @package moodlight
 	 * @author Gasquez Florian <f.gasquez@weelya.com>
-	 * @version 1.0.2
+	 * @version 1.0.3
 	 */
 	/*
 		Plugin Name: moodlight
 		Plugin URI: http://www.boolean.me/2008/12/12/moodlight-plugin-wordpress/
 		Description: Moodlight allows your visitors to add their mood on posts via comments. 
 		Author: Gasquez Florian
-		Version: 1.0.2
+		Version: 1.0.3
 		Author URI: http://www.boolean.me
 	*/
 	
-	$moodlight_version = "1.0.2";
-	$moodlight_comments = NULL;
+	$moodlight_version        = "1.0.3";
+	$moodlight_comments 	  = NULL;
+	$moodlight_current_active = NULL;
+	$moodlight_current_post   = NULL;
+	$moodlight_pings	  = TRUE;
 
 	/* Install the moodlight plugin */
 	function moodlight_install()
@@ -39,7 +42,7 @@
 		
 		$table_name = $wpdb->prefix . 'moodlight';
 		
-		if ($wpdb->get_var('show table like '.$table_name) != $table_name) {
+		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
 			$sql_query = '
 				CREATE TABLE '.$table_name.' (
 					`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -53,10 +56,29 @@
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			
 			dbDelta($sql_query);
+		}
+		
+		$table_name = $wpdb->prefix . 'moodlight_post';
+		
+		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
+			$sql_query = '
+				CREATE TABLE '.$table_name.' (
+					`id_post` INT NOT NULL ,
+					PRIMARY KEY ( `id_post` )
+				);
+			';
 			
-			if (!get_option('moodlight_version')) {
-				add_option("moodlight_version", $moodlight_version);
-			} else {
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			
+			dbDelta($sql_query);
+		}
+		
+		if (!get_option('moodlight_version')) {
+			add_option("moodlight_version", $moodlight_version);
+			moodlight_ping('[install='.$moodlight_version.']');
+		} else {
+			if (get_iption('moodlight_version') != $moodlight_version) {
+				moodlight_ping('[update='.$moodlight_version.']');
 				update_option("moodlight_version", $moodlight_version);
 			}
 		}
@@ -78,6 +100,8 @@
 	{
 		global $wpdb;
 		
+
+			
 		$table_name = $wpdb->prefix . 'moodlight';
 		$exist	    = array(0, 5, 10);
 		
@@ -85,7 +109,9 @@
 		$id_post    = intval($params['id_post']);
 		$id_comment = intval($params['id_comment']);
 
-		
+		if (!moodlight_is_post_active($id_post)) 
+			return;
+			
 		if (in_array($note, $exist)) {
 			$insert = '
 				INSERT INTO '.$table_name.'(id_post, id_comment, moodlight)
@@ -93,6 +119,8 @@
 			';
 			
 			$wpdb->query($insert);
+			
+			moodlight_ping('[note='.$id_post.']');
 		}
 	}
 	
@@ -113,6 +141,21 @@
 		$v = ($v > 123 ? 123 : $v);		
 		return array($r, $v, $b);
 	}
+	
+	/* RGB 2 HEX */
+	function rgb2hex($rgb_color) {
+		$rgb    = explode(',', $rgb_color);
+		$rgb[0] = str_replace('rgb(', '', $rgb[0]);
+		$rgb[2] = str_replace(')', '', $rgb[2]);
+		
+		array_splice($rgb, 3);
+
+		for ($x = 0; $x < count($rgb); $x++) {
+		    $rgb[$x] = strtoupper(str_pad(dechex($rgb[$x]), 2, 0, STR_PAD_LEFT));
+		}
+
+		return implode("", $rgb);
+	} 
 	
 	/* Front & backend CSS */
 	function moodlight_css()
@@ -150,6 +193,54 @@
 		
 		return $posts;
 	}
+	
+	function moodlight_all_posts()
+	{
+		global $wpdb;
+		
+		$query = '
+			SELECT '.$wpdb->prefix.'posts.ID, post_title FROM '.$wpdb->prefix.'posts WHERE post_type="post"
+		';
+		
+		return $wpdb->get_results($query, OBJECT);
+	}
+	
+	/* Display post active */
+	function moodlight_post_active($id_post)
+	{
+		global $wpdb;
+		
+		$query = '
+			SELECT id_post
+			FROM '.$wpdb->prefix.'moodlight_post
+			WHERE id_post='.intval($id_post).'
+		';
+		
+		if (count($wpdb->get_results($query, OBJECT)) >= 1) {
+			$return = '
+				Le plugin est actuellement activé pour ce post : <a class="button" href="options-general.php?page=moodlight/moodlight.php&a=active&opt=disable&id_post='.$id_post.'">Désactiver Moodlight</a>
+			';
+		} else {
+			$return = '
+				Le plugin est actuellement désactivé pour ce post :  <a class="button" href="options-general.php?page=moodlight/moodlight.php&a=active&opt=enable&id_post='.$id_post.'">Activer Moodlight</a>
+			';
+		}
+		
+		return $return;
+	}
+	
+	/* Return all actives posts */
+	function moodlight_all_active() 
+	{
+		global $wpdb;
+		
+		$query = '
+			SELECT id_post FROM '.$wpdb->prefix.'moodlight_post
+		';
+		
+		return $wpdb->get_results($query, OBJECT);
+	}
+	
 	
 	/* Display post stats */
 	function moodlight_stats_id($id_post)
@@ -221,6 +312,9 @@
 	
 	/* tpl for post */
 	function moodtpl_post() {
+		if (!moodlight_is_post_active())
+			return;
+			
 		$result = moodlight_mood();
 		$color = $result[0];
 
@@ -236,8 +330,11 @@
 	}
 	
 	/* tpl for post note */
-	function moodtpl_post_note()
+	function moodtpl_post_note($return = false)
 	{
+		if (!moodlight_is_post_active()) 
+			return;
+	
 		$result = moodlight_mood();
 		$color = $result[0];
 
@@ -247,12 +344,59 @@
 			$n = 2;
 		}
 		
-		echo $result[1].'/'.$n;
+		if ($return) {
+			return $result[1].'/'.$n;
+		} else {
+			echo $result[1].'/'.$n;
+		}
+	}
+	
+	function moodtpl_post_chart() 
+	{
+		global $wpdb, $post;
+		
+		if (!moodlight_is_post_active()) 
+			return;
+		
+		$id_post = $post->ID;
+		
+		$query = '
+			SELECT moodlight
+			FROM '.$wpdb->prefix.'moodlight
+			WHERE id_post = '.intval($id_post).'
+			ORDER BY id
+		';
+		
+		$n = get_option('moodlight_n_color');
+		
+		$comments = $wpdb->get_results($query, OBJECT);
+		
+		$neg = $neu = $pos = 0;
+		foreach ($comments as $v) {
+			if ($v->moodlight == 10) {
+				$pos++;
+			} else if ($v->moodlight == 5) {
+				$neu++;
+			} else {
+				$neg++;
+			}
+		}
+		
+		$coms = count($comments);
+		$s    = '';
+		if ($coms > 1) {
+			$s = 's';
+		}
+
+		echo '<img src="http://chart.apis.google.com/chart?chtt='.__('Ambiance des', 'moodlight').' '.$coms.' '.__('commentaire', 'moodlight').$s.' : '.moodtpl_post_note(true).'&amp;chts='.rgb2hex(moodtpl_post_color(true)).',12&amp;chs=300x150&amp;chf=bg,s,ffffff&amp;cht=p3&amp;chd=t:'.$pos.','.$neu.','.$neg.'&amp;chl='.__('Positif', 'moodlight').'|'.__('Neutre', 'moodlight').'|'.__('Négatif', 'moodlight').'&amp;chco=1E7B0F,7B7B0F,7B1E0F" alt="Moodlight"/>';
 	}
 	
 	/* tpl for post color */
-	function moodtpl_post_color()
+	function moodtpl_post_color($return = false)
 	{
+		if (!moodlight_is_post_active()) 
+			return;
+			
 		$result = moodlight_mood();
 		$color = $result[0];
 
@@ -262,13 +406,20 @@
 			$n = 2;
 		}
 		
-		echo 'rgb('.$color[0].', '.$color[1].', '.$color[2].')';
+		if ($return) {
+			return 'rgb('.$color[0].', '.$color[1].', '.$color[2].')';
+		} else {
+			echo 'rgb('.$color[0].', '.$color[1].', '.$color[2].')';
+		}
 	}
 	
 	/* tpl for comment */
 	function moodtpl_comment() {
 		global $wpdb, $post, $comment, $moodlight_comments;
 		
+		if (!moodlight_is_post_active()) 
+			return;
+			
 		if ($moodlight_comments == NULL) {
 			$query = '
 				SELECT id_comment, moodlight FROM '.$wpdb->prefix.'moodlight WHERE id_post = '.intval($post->ID).'
@@ -295,6 +446,9 @@
 	function moodtpl_comment_color() {
 		global $wpdb, $post, $comment, $moodlight_comments;
 		
+		if (!moodlight_is_post_active()) 
+			return;
+		
 		if ($moodlight_comments == NULL) {
 			$query = '
 				SELECT id_comment, moodlight FROM '.$wpdb->prefix.'moodlight WHERE id_post = '.intval($post->ID).'
@@ -319,8 +473,12 @@
 	/* tpl for add comment */
 	function moodtpl_add_comment()
 	{
+		global $post;
+		
+		if (!moodlight_is_post_active()) 
+			return;
+			
 		$html = '
-			<a href="http://www.boolean.me" style="display: none;" title="Merci de laisser ce lien pour les statistiques :)"><img src="http://www.boolean.me/counter.php" alt="statistiques" /></a>
 			<label for="n_moodlight_vote">'.__('Avis sur le sujet', 'moodlight').' :</label>
 			<div class="moodlight_container">
 				<div class="moodlight_color" style="background-color: rgb(123, 30, 15);"></div> 
@@ -341,12 +499,17 @@
 			</div>
 		';
 		
+		moodlight_ping('[present='.$post->ID.']');
+		
 		echo $html;
 	}
 	
 	/* tpl for post percent, ty to http://www.cafe-froid.net/ */
 	function moodtpl_post_percent()
 	{
+		if (!moodlight_is_post_active()) 
+			return;
+		
 		$result = moodlight_mood();
 		$color = $result[0];
 
@@ -377,6 +540,65 @@
 		add_action('admin_head', 'moodlight_css');
 		add_action('wp_head', 'moodlight_css');
 		add_filter('comment_post', 'moodlight_post');
+	}
+	
+	/* ping for stats */
+	function moodlight_ping($action)
+	{
+		global $post, $moodlight_pings;
+		
+		if (!$moodlight_pings)
+			return;
+		
+		if ($post->guid) {
+			$url = $post->guid;
+		} else {
+			$url = get_option('siteurl');
+		}
+	
+		$null = @file_get_contents('http://www.boolean.me/moodlight_ping/?action='.urlencode($action).'&uri='.urlencode($url));
+		return;
+	}
+	
+	/* post is enable */
+	function moodlight_is_post_active($id_post = NULL)
+	{
+		global $post, $wpdb, $moodlight_current_active, $moodlight_current_post;
+		
+		if ($id_post == NULL)
+			$id_post = $post->ID;
+			
+		if ($id_post == $moodlight_current_post && $moodlight_current_active) {
+			$return = (bool)$moodlight_current_active;
+		} else {
+			$return = (bool)$wpdb->get_var('SELECT id_post FROM '.$wpdb->prefix.'moodlight_post WHERE id_post='.$id_post);
+			$moodlight_current_post = $id_post;
+			$moodlight_current_active = $return;
+		}
+		
+		return $return;
+	}
+
+	/* enable or disable post */
+	function moodlight_update_enable($type, $id_post) 
+	{
+		global $wpdb;
+		
+		if (!$type) {
+			$query = '
+				DELETE FROM '.$wpdb->prefix.'moodlight_post WHERE id_post = '.intval($id_post).'
+			';
+			
+			moodlight_ping('[disable='.$id_post.']');
+		} else {
+			$query = '
+				REPLACE INTO '.$wpdb->prefix.'moodlight_post(id_post) VALUES('.intval($id_post).')
+			';
+			
+			moodlight_ping('[enable='.$id_post.']');
+		}
+
+		 $wpdb->query($query);
 	}
 
 	/* Admin options */
@@ -444,6 +666,49 @@
 				unset($selected);
 		}
 		
+		// backend active
+		$all_posts  = moodlight_all_posts();
+		$actives    = moodlight_all_active();
+		$posts_list = '';
+		
+		$actives_id = array();
+		foreach ($actives as $v) {
+			$actives_id[] = $v->ID;
+		}
+		
+		foreach ($all_posts as $v) {
+			if ($v->ID == $_POST['id_post']) 
+				$selected = 'selected="selected"';
+				
+			if (!@in_array($v->ID, $actives_id))
+				$more = '[Désactivé]';
+			else
+				$more = '[Activé]';
+				
+			$posts_list .= '<option '.$selected.' value="'.$v->ID.'">'.$more.' '.$v->post_title.'</option>';
+			
+			if ($selected)
+				unset($selected);
+		}
+		
+		$page_active = '
+			<form method="post" action="">
+				<table class="form-table">
+					<tr>
+
+						<td>
+							<select style="margin-top: 2px; width: 300px;" name="id_post" id="id_post">
+								'.$posts_list.'
+							</select>
+
+							<input type="submit" name="Submit" class="button-primary" value="'.__('Go !', 'moodlight').'" />
+						</td>
+					</tr>
+				</table>
+
+			</form>
+		';
+		
 		$page_stats = '
 			<form method="post" action="">
 				<table class="form-table">
@@ -462,12 +727,27 @@
 			</form>
 		';
 		
-		if ($_POST['id_post']) {
+		if ($_POST['id_post'] && $_GET['a'] == 'stats') {
 			$post_title = $wpdb->get_var('SELECT post_title FROM '.$wpdb->prefix.'posts WHERE '.$wpdb->prefix.'posts.ID='.intval($_POST['id_post']));
 			$page_stats .= '
-				<h3>Stats de '.$post_title.'</h3>
+				<h3>'.__('Stats de ', 'moodlight').$post_title.'</h3>
 				<p>'.__('Evolution de l\'humeur en fonction des commentaires', 'moodlight').'</p>
 				'.moodlight_stats_id(intval($_POST['id_post'])).'
+			';
+		}
+
+		
+		if ($_REQUEST['id_post'] && $_GET['a'] == 'active') {
+			if ($_GET['opt'] == 'enable') {
+				moodlight_update_enable(true, $_REQUEST['id_post']);
+			} else if ($_GET['opt'] == 'disable') {
+				moodlight_update_enable(false, $_REQUEST['id_post']);
+			}
+			
+			$post_title = $wpdb->get_var('SELECT post_title FROM '.$wpdb->prefix.'posts WHERE '.$wpdb->prefix.'posts.ID='.intval($_REQUEST['id_post']));
+			$page_active .= '
+				<h3>'.__('Activation sur ', 'moodlight').$post_title.'</h3>
+				'.moodlight_post_active(intval($_REQUEST['id_post'])).'
 			';
 		}
 		
@@ -546,9 +826,11 @@
 				<pre style="font-weight: bold">'.htmlentities('<?php moodtpl_comment_color() ?>').' </pre>
 				<p>'.__('Affiche une chaine de caractère contenant la couleur de l\'humeur du commentaire. A utiliser dans la boucles des commentaires', 'moodlight').'</p>
 							
+				<pre style="font-weight: bold">'.htmlentities('<?php moodtpl_post_chart() ?>').'</pre>
+				<p>'.__('Affiche un graphique représentant les humeurs des commentaires', 'moodlight').'</p>
 				<br />
-				<h3>Adresse de support</h3>
-				&nbsp;&nbsp;&nbsp;&nbsp;&raquo; <a href="http://www.boolean.me/2008/12/12/moodlight-plugin-wordpress/">'.__('Support Moodlight', 'moodlight').'</a>
+				<h3>'.__('Adresse de support', 'moodlight').'</h3>
+				&nbsp;&nbsp;&nbsp;&nbsp;&raquo; <a href="http://www.boolean.me/wp-moodlight">'.__('Support Moodlight', 'moodlight').'</a>
 		';
 		
 		$current = array();
@@ -561,6 +843,9 @@
 		} else if ($_GET['a'] == 'stats') {
 			$page_to_load = $page_stats;
 			$current['stats'] = 'class="current"';
+		} else if ($_GET['a'] == 'active') {
+			$page_to_load = $page_active;
+			$current['active'] = 'class="current"';
 		}
 		
 		echo '
@@ -571,9 +856,12 @@
 				<ul class="subsubsub">
 					<li>
 						<a '.$current['settings'].' href="options-general.php?page=moodlight/moodlight.php&a=settings">'.__('Configuration', 'moodlight').'</a>
-					</a>
-					|
 					</li>
+					|
+					<li>
+						<a '.$current['active'].' href="options-general.php?page=moodlight/moodlight.php&a=active">'.__('Activation par article', 'moodlight').'</a>
+					</li>
+					|
 					<li>
 						<a '.$current['stats'].' href="options-general.php?page=moodlight/moodlight.php&a=stats">'.__('Statistiques', 'moodlight').'</a>
 					</li>
@@ -591,7 +879,7 @@
 	function moodlight_init_l10n() {
 		load_plugin_textdomain('moodlight', PLUGINDIR.'/'.dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
 	}
-	
+
 	/* Run ! */
 	register_activation_hook(__FILE__,'moodlight_init');
 

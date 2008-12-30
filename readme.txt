@@ -3,7 +3,7 @@ Contributors: Gasquez Florian
 Tags: moodlight, comments, posts, mood, thread, debate, tags, vote, rank, stats
 Requires at least: 2.6.0
 Tested up to: 2.7
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 
 Moodlight allows your visitors to add their mood on posts via comments.
 
@@ -34,14 +34,14 @@ Les appréciations des visiteurs sont traduites par des couleurs, il devient alo
 1. Moodlight options
 2. Moodlight stats
 3. Moodlight front
+4. Moodlight stats
 
 == Frequently Asked Questions ==
 = 1. How to add templates functions to your current template ? =
-You can see the Moodlight page on Boolean.me : http://www.boolean.me/moodlight 
+You can see the Moodlight page on Boolean.me : http://www.boolean.me/wp-moodlight 
 
 == Notes ==
 - Thanks to John Chavarria for en_EN.
 - Thanks to Anthony Catel for colors functions
 - Thanks to http://www.cafe-froid.net for percent function.
-- A backlink for boolean.me on line 323 [moodlight.php], you can remove it.
-- A blank img on line 323 [moodlight.php] for stats, please don't remove.
+- moodlight_ping is used for stats and a future project. You can disable this function : $moodlight_pings = NULL; in moodlight.php [line 36]
