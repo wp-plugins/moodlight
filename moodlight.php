@@ -18,18 +18,18 @@
 	/**
 	 * @package moodlight
 	 * @author Gasquez Florian <f.gasquez@weelya.com>
-	 * @version 1.0.3
+	 * @version 1.0.3-2
 	 */
 	/*
 		Plugin Name: moodlight
-		Plugin URI: http://www.boolean.me/2008/12/12/moodlight-plugin-wordpress/
+		Plugin URI: http://www.boolean.me/wp-moodlight
 		Description: Moodlight allows your visitors to add their mood on posts via comments. 
 		Author: Gasquez Florian
-		Version: 1.0.3
+		Version: 1.0.3-2
 		Author URI: http://www.boolean.me
 	*/
 	
-	$moodlight_version        = "1.0.3";
+	$moodlight_version        = "1.0.3-2";
 	$moodlight_comments 	  = NULL;
 	$moodlight_current_active = NULL;
 	$moodlight_current_post   = NULL;
@@ -42,7 +42,7 @@
 		
 		$table_name = $wpdb->prefix . 'moodlight';
 		
-		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
+		if ($wpdb->get_var('show tables like "'.$table_name.'"') != $table_name) {
 			$sql_query = '
 				CREATE TABLE '.$table_name.' (
 					`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -60,7 +60,7 @@
 		
 		$table_name = $wpdb->prefix . 'moodlight_post';
 		
-		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
+		if ($wpdb->get_var('show tables like "'.$table_name.'"') != $table_name) {
 			$sql_query = '
 				CREATE TABLE '.$table_name.' (
 					`id_post` INT NOT NULL ,
@@ -588,7 +588,7 @@
 		
 		// Ugly updates
 		$table_name = $wpdb->prefix . 'moodlight_post';
-		if ($wpdb->get_var('show tables like '.$table_name) != $table_name) {
+		if ($wpdb->get_var('show tables like "'.$table_name.'"') != $table_name) {
 			$sql_query = '
 				CREATE TABLE '.$table_name.' (
 					`id_post` INT NOT NULL ,
@@ -836,6 +836,9 @@
 				
 				<pre style="font-weight: bold">'.htmlentities('<?php moodtpl_post_color(); ?>').' </pre>
 				<p>'.__('Affiche une chaine de caractère contenant la couleur de l\'humeur de l\'article. A utiliser dans la boucles des articles ou dans un article seul', 'moodlight').'.</p>
+				
+				<pre style="font-weight: bold">'.htmlentities('<?php moodtpl_post_percent(); ?>').' </pre>
+				<p>'.__('Affiche le pourcentage de personnes en accord avec le sujet', 'moodlight').'.</p>
 				
 				<pre style="font-weight: bold">'.htmlentities('<?php moodtpl_post_note() ?>').' </pre>
 				<p>'.__('Affiche la notation de l\'article sous forme purement textuelle. A utiliser dans la boucles des articles ou dans un article seul', 'moodlight').'.</p>

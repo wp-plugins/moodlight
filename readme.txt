@@ -3,7 +3,7 @@ Contributors: Gasquez Florian
 Tags: moodlight, comments, posts, mood, thread, debate, tags, vote, rank, stats
 Requires at least: 2.6.0
 Tested up to: 2.7
-Stable tag: 1.0.3
+Stable tag: 1.0.3-2
 
 Moodlight allows your visitors to add their mood on posts via comments.
 
